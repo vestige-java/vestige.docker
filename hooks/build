@@ -36,6 +36,17 @@ fi
 
 docker run -i -v "$PWD/target":/data alpine unzip /data/vestige.zip -d /data/vestige
 
+mv "$PWD/target/vestige/repository" "$PWD/target/repository"
+
+# -e 's|VESTIGE_CORE_RELATIVE_DIRECTORY=.*|VESTIGE_CORE_RELATIVE_DIRECTORY="/root/.m2"|'
+sed -i~ -e 's/VESTIGE_CONFIG=.*/VESTIGE_CONFIG="${XDG_CONFIG_HOME:-$HOME\/.config}\/vestige"/' -e 's/VESTIGE_DATA=.*/VESTIGE_DATA="${XDG_DATA_HOME:-$HOME\/.local\/share}\/vestige"/' -e 's/VESTIGE_CACHE=.*/VESTIGE_CACHE="${XDG_CACHE_HOME:-$HOME\/.cache}\/vestige"/' "$PWD/target/vestige/vestige"
+rm "$PWD/target/vestige/vestige~"
+
+sed -i~ -e "/proxy_vole\.gsettings/d" "$PWD/target/vestige/jvm_enhancer.properties"
+rm "$PWD/target/vestige/jvm_enhancer.properties~"
+
+find "$PWD/target/vestige/lib" -name '*.so' -delete
+
 JDK_VERSION_NUMBER=$(echo $JDK_VERSION | sed -r 's/^[^0-9]*([0-9]+).*$/\1/')
 
 if [ "$JDK_VERSION_NUMBER" -le 8 ]; then

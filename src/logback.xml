@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="false">
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+      <providers>
+        <timestamp>
+          <fieldName>ts</fieldName>
+          <timeZone>UTC</timeZone>
+        </timestamp>
+        <loggerName>
+          <fieldName>logger</fieldName>
+        </loggerName>
+        <logLevel>
+          <fieldName>level</fieldName>
+        </logLevel>
+        <threadName>
+          <fieldName>thread</fieldName>
+        </threadName>
+        <mdc />
+        <arguments>
+          <includeNonStructuredArguments>false</includeNonStructuredArguments>
+        </arguments>
+        <stackTrace>
+          <fieldName>stack</fieldName>
+        </stackTrace>
+        <message>
+          <fieldName>msg</fieldName>
+        </message>
+      </providers>
+    </encoder>
+  </appender>
+
+  <logger name="org.apache.sshd" level="OFF" />
+  <logger name="com.btr.proxy" level="ERROR" />
+  <logger name="fr.gaellalire.vestige.platform" level="WARN" />
+  <logger name="fr.gaellalire.vestige.system" level="WARN" />
+  <logger name="fr.gaellalire.vestige.jvm_enhancer" level="INFO" />
+  <logger name="fr.gaellalire.vestige.edition.maven_main_launcher" level="INFO" />
+  <logger name="fr.gaellalire.vestige.edition.standard" level="INFO" />
+  <logger name="fr.gaellalire.vestige.resolver.maven" level="INFO" />
+  <logger name="fr.gaellalire.vestige.application.manager" level="INFO" />
+  <logger name="fr.gaellalire.vestige.system.logger.SLF4JOutputStream" level="INFO" />
+
+  <root level="INFO">
+    <appender-ref ref="STDOUT" />
+  </root>
+</configuration>
