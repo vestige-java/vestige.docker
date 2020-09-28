@@ -1,8 +1,14 @@
 #!/bin/bash
 
-VESTIGE_VERSION=$(echo $DOCKER_TAG | cut -d "-" -f1)
 if [ "$VESTIGE_VERSION" = "" ]; then
-  VESTIGE_VERSION=$(git describe --tags --abbrev=0 --exact-match)
+  VESTIGE_VERSION=$(echo $DOCKER_TAG | cut -d "-" -f1)
+  if [ "$VESTIGE_VERSION" = "" ]; then
+    VESTIGE_VERSION=$(git describe --tags --abbrev=0 --exact-match)
+    if [ "$?" -ne 0 ]; then
+      echo "Unable to find VESTIGE_VERSION please fix it"
+      exit 1
+    fi
+  fi
 fi
 
 OS_TYPE=$(echo $DOCKER_TAG | cut -d "-" -f2)
@@ -28,10 +34,14 @@ rm -rf target
 
 mkdir -p target/vestige
 
-if [ "$VESTIGE_VERSION" = "latest" ]; then
-  docker run -i -v "$PWD/target":/data alpine wget https://gaellalire.fr/vestige/latest-zip-unix -O /data/vestige.zip
+if [ "$VESTIGE_ZIP_PATH" = "" ]; then
+  if [ "$VESTIGE_VERSION" = "latest" ]; then
+    docker run -i -v "$PWD/target":/data alpine wget https://gaellalire.fr/vestige/latest-zip-unix -O /data/vestige.zip
+  else
+    docker run -i -v "$PWD/target":/data alpine wget https://gaellalire.fr/nexus/content/repositories/releases/fr/gaellalire/vestige/vestige.assemblies.standard_edition_standalone/${VESTIGE_VERSION}/vestige.assemblies.standard_edition_standalone-${VESTIGE_VERSION}-unix.zip -O /data/vestige.zip
+  fi
 else
-  docker run -i -v "$PWD/target":/data alpine wget https://gaellalire.fr/nexus/content/repositories/releases/fr/gaellalire/vestige/vestige.assemblies.standard_edition_standalone/${VESTIGE_VERSION}/vestige.assemblies.standard_edition_standalone-${VESTIGE_VERSION}-unix.zip -O /data/vestige.zip
+  cp "$(eval echo "$VESTIGE_ZIP_PATH")" $PWD/target/vestige.zip
 fi
 
 docker run -i -v "$PWD/target":/data alpine unzip /data/vestige.zip -d /data/vestige
@@ -55,5 +65,5 @@ else
   find . -name '*6to8*' -prune -exec rm -rf {} \;
 fi
 
-docker build --build-arg JDK_VERSION=${JDK_VERSION} --build-arg OS_TYPE=${OS_TYPE} -t ${IMAGE_NAME} .
+docker build --no-cache --build-arg JDK_VERSION=${JDK_VERSION} --build-arg OS_TYPE=${OS_TYPE} -t ${IMAGE_NAME} .
 
