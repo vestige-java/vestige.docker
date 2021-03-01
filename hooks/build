@@ -63,6 +63,7 @@ if [ "$JDK_VERSION_NUMBER" -le 8 ]; then
   find . -name '*jdk15on*' -prune -exec rm -rf {} \;
 else
   find . -name '*6to8*' -prune -exec rm -rf {} \;
+  find . -name '*jdk15to18*' -prune -exec rm -rf {} \;
 fi
 
 docker build --no-cache --build-arg JDK_VERSION=${JDK_VERSION} --build-arg OS_TYPE=${OS_TYPE} -t ${IMAGE_NAME} .
